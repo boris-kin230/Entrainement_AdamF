@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Exercice Guidé 2 - Maths 1ère</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']], processEscapes: true },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --secondary: #ec4899;
+            --success: #10B981;
+            --danger: #EF4444;
+            --bg-gradient: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --text-dark: #1f2937;
+            --text-light: #4b5563;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .user-info { display: flex; align-items: center; gap: 10px; }
+        .user-info .avatar { font-size: 2rem; background: white; padding: 5px; border-radius: 50%; }
+        .user-info .pseudo { font-weight: 700; color: var(--primary); }
+        
+        .btn-back {
+            text-decoration: none;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        #exo-container { max-width: 800px; margin: 0 auto; width: 100%; padding-bottom: 80px; }
+
+        .context-box {
+            padding: 25px;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.85);
+            border-left: 6px solid var(--primary);
+        }
+
+        .context-box h2 {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .step-card {
+            padding: 25px;
+            margin-bottom: 30px;
+            animation: fadeIn 0.5s ease-out;
+            display: none;
+        }
+
+        .step-card.active {
+            display: block;
+        }
+
+        .step-title {
+            font-size: 1.15rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--secondary);
+            line-height: 1.6;
+        }
+
+        .question-text {
+            font-size: 1.05rem;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 12px;
+            grid-template-columns: 1fr;
+        }
+
+        @media (min-width: 600px) {
+            .options-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        .option-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid transparent;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 70px;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.15);
+        }
+
+        .option-btn:disabled { cursor: not-allowed; opacity: 0.7; }
+        .option-btn.correct { background: var(--success); color: white; border-color: var(--success); transform: scale(1.02); }
+        .option-btn.wrong { background: var(--danger); color: white; border-color: var(--danger); animation: shake 0.4s; }
+
+        .feedback-area {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .feedback-area.show { display: block; animation: slideDown 0.3s ease-out; }
+
+        .explanation-box {
+            padding: 20px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.85);
+            border-left: 5px solid var(--success);
+            font-size: 1rem;
+            color: var(--text-dark);
+            line-height: 1.6;
+        }
+
+        .btn-next-step {
+            margin-top: 15px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .btn-next-step:hover { background: #be185d; }
+
+        /* Modal de fin */
+        #end-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-content h2 { font-size: 2rem; color: var(--primary); margin-bottom: 10px; }
+        
+        .btn-finish {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+
+        footer { text-align: center; padding: 20px; font-size: 0.8rem; color: var(--text-light); margin-top: auto; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes shake { 0%, 100% {transform: translateX(0);} 25% {transform: translateX(-5px);} 75% {transform: translateX(5px);} }
+    </style>
+</head>
+<body>
+
+    <header class="glass-panel">
+        <a href="index.html" class="btn-back">◄ Retour</a>
+        <div class="user-info">
+            <span class="avatar" id="header-avatar">👨‍🎓</span>
+            <span class="pseudo" id="header-pseudo">Adam</span>
+        </div>
+    </header>
+
+    <main id="exo-container">
+        <div class="glass-panel context-box">
+            <h2>Énoncé du problème</h2>
+            <p>On considère la fonction polynôme $f$ définie sur $\mathbb{R}$ par :</p>
+            <p style="text-align: center; font-size: 1.3rem; margin: 15px 0;"><strong>$\displaystyle f(x) = x^3 - 3x^2 + 4$</strong></p>
+            <p>On souhaite étudier les variations de cette fonction, trouver ses extrema locaux et déterminer l'équation d'une tangente remarquable. <em>Valide chaque étape pour avancer !</em></p>
+        </div>
+
+        </main>
+
+    <div id="end-modal">
+        <div class="modal-content">
+            <h2>Superbe ! 🚀</h2>
+            <p>Tu as maîtrisé cette étude de polynôme de bout en bout.</p>
+            <p>Ton résultat a été enregistré dans le menu.</p>
+            <a href="index.html" class="btn-finish">Retour au menu</a>
+        </div>
+    </div>
+
+    <footer>Conçu par <strong>Boris KINNOUEZAN</strong></footer>
+
+    <script>
+        // --- DONNÉES DE L'EXERCICE GUIDÉ 2 ---
+        const steps = [
+            {
+                title: "Étape 1 : Calcul de la dérivée",
+                question: "Détermine l'expression de la fonction dérivée $f'(x)$.",
+                options: ["$f'(x) = 3x^2 - 3x$", "$f'(x) = 3x^2 - 6x$", "$f'(x) = x^2 - 6x$"],
+                correct: 1,
+                ex: "<strong>Très bien !</strong><br>La dérivée de $x^3$ est $3x^2$, celle de $-3x^2$ est $-3 \times 2x = -6x$, et la constante $4$ disparaît.<br>Donc $f'(x) = 3x^2 - 6x$."
+            },
+            {
+                title: "Étape 2 : Points critiques",
+                question: "Pour étudier les variations, on cherche les racines de la dérivée. Résous l'équation $f'(x) = 0$.",
+                options: ["$x = 0$ et $x = -2$", "$x = 2$ uniquement", "$x = 0$ et $x = 2$"],
+                correct: 2,
+                ex: "<strong>Exact !</strong><br>On résout $3x^2 - 6x = 0$. On peut factoriser par $3x$ :<br>$3x(x - 2) = 0$<br>Un produit est nul si l'un de ses facteurs est nul, d'où $x = 0$ ou $x = 2$."
+            },
+            {
+                title: "Étape 3 : Calcul d'un extremum",
+                question: "Le tableau de signes de $f'(x)$ (un trinôme du second degré) nous indique que $f$ admet un <strong>minimum local</strong> en $x = 2$. Calcule la valeur de ce minimum, c'est-à-dire $f(2)$.",
+                options: ["$0$", "$-4$", "$4$"],
+                correct: 0,
+                ex: "<strong>C'est tout à fait ça !</strong><br>On remplace $x$ par $2$ <strong>dans la fonction de départ $f$</strong> (et non dans la dérivée !) :<br>$f(2) = 2^3 - 3(2)^2 + 4 = 8 - 12 + 4 = 0$."
+            },
+            {
+                title: "Étape 4 : Équation de tangente",
+                question: "Détermine l'équation réduite de la tangente à la courbe représentative de $f$ au point d'abscisse $x = 1$.",
+                options: ["$y = -3x + 1$", "$y = -3x + 5$", "$y = 3x - 1$"],
+                correct: 1,
+                ex: "<strong>Parfait ! Tu as terminé l'exercice.</strong><br>La formule est $y = f'(1)(x - 1) + f(1)$.<br>On calcule :<br>- $f(1) = 1^3 - 3(1)^2 + 4 = 1 - 3 + 4 = 2$<br>- $f'(1) = 3(1)^2 - 6(1) = 3 - 6 = -3$<br>L'équation est donc $y = -3(x - 1) + 2 = -3x + 3 + 2 = -3x + 5$."
+            }
+        ];
+
+        let currentStepIndex = 0;
+        let errorsMade = 0; // Pour calculer le score
+
+        // --- INITIALISATION UTILISATEUR ---
+        function initUser() {
+            const storedUser = localStorage.getItem('mathAppUser');
+            if (storedUser) {
+                const userData = JSON.parse(storedUser);
+                document.getElementById('header-pseudo').textContent = userData.pseudo;
+                document.getElementById('header-avatar').textContent = userData.avatar;
+            } else {
+                window.location.href = 'index.html';
+            }
+        }
+
+        // --- GÉNÉRATION DES ÉTAPES ---
+        function renderSteps() {
+            const container = document.getElementById('exo-container');
+            
+            steps.forEach((stepObj, index) => {
+                const stepCard = document.createElement('div');
+                stepCard.className = `glass-panel step-card ${index === 0 ? 'active' : ''}`;
+                stepCard.id = `step-${index}`;
+
+                const title = document.createElement('div');
+                title.className = 'step-title';
+                title.innerHTML = stepObj.title;
+                stepCard.appendChild(title);
+
+                const question = document.createElement('div');
+                question.className = 'question-text';
+                question.innerHTML = stepObj.question;
+                stepCard.appendChild(question);
+
+                const grid = document.createElement('div');
+                grid.className = 'options-grid';
+
+                stepObj.options.forEach((optText, optIndex) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'option-btn';
+                    btn.innerHTML = optText;
+                    btn.onclick = () => handleAnswer(index, optIndex, btn, grid);
+                    grid.appendChild(btn);
+                });
+                stepCard.appendChild(grid);
+
+                const feedbackArea = document.createElement('div');
+                feedbackArea.className = 'feedback-area';
+                feedbackArea.id = `feedback-${index}`;
+
+                const explBox = document.createElement('div');
+                explBox.className = 'explanation-box';
+                explBox.innerHTML = stepObj.ex;
+                feedbackArea.appendChild(explBox);
+
+                // Bouton pour passer à l'étape suivante ou terminer
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'btn-next-step';
+                nextBtn.textContent = index === steps.length - 1 ? "Terminer l'exercice" : "Passer à l'étape suivante";
+                nextBtn.onclick = () => nextStep(index);
+                feedbackArea.appendChild(nextBtn);
+
+                stepCard.appendChild(feedbackArea);
+                container.appendChild(stepCard);
+            });
+
+            // Compilation MathJax
+            if(window.MathJax) {
+                MathJax.typesetPromise([container]).catch((err) => console.log(err.message));
+            }
+        }
+
+        // --- GESTION DES RÉPONSES ---
+        function handleAnswer(stepIndex, optIndex, selectedBtn, gridContainer) {
+            const stepObj = steps[stepIndex];
+            const isCorrect = (optIndex === stepObj.correct);
+
+            if (isCorrect) {
+                // Bonne réponse : on bloque tout et on affiche la suite
+                const allBtns = gridContainer.querySelectorAll('.option-btn');
+                allBtns.forEach(btn => {
+                    btn.disabled = true;
+                    if (btn === selectedBtn) {
+                        btn.classList.add('correct');
+                    }
+                });
+
+                const feedbackArea = document.getElementById(`feedback-${stepIndex}`);
+                feedbackArea.classList.add('show');
+                
+                // Re-compiler MathJax si besoin
+                if(window.MathJax) {
+                    MathJax.typesetPromise([feedbackArea]).catch((err) => console.log(err.message));
+                }
+            } else {
+                // Mauvaise réponse : on la met en rouge et on laisse l'élève réessayer
+                if (!selectedBtn.classList.contains('wrong')) {
+                    selectedBtn.classList.add('wrong');
+                    selectedBtn.disabled = true; // Désactive ce bouton faux
+                    errorsMade++;
+                }
+            }
+        }
+
+        // --- ÉTAPE SUIVANTE ---
+        function nextStep(currentIndex) {
+            const currentCard = document.getElementById(`step-${currentIndex}`);
+            currentCard.classList.remove('active'); // On cache l'ancienne étape pour alléger l'écran
+            currentCard.style.display = 'none';
+
+            if (currentIndex < steps.length - 1) {
+                const nextCard = document.getElementById(`step-${currentIndex + 1}`);
+                nextCard.style.display = 'block';
+                setTimeout(() => nextCard.classList.add('active'), 50);
+            } else {
+                endExercise();
+            }
+        }
+
+        // --- FIN DE L'EXERCICE ---
+        function endExercise() {
+            // Calcul d'un score basique (4 questions, -1 point par erreur)
+            let score = Math.max(0, 4 - errorsMade);
+            localStorage.setItem('score_exo2', `${score}/4`);
+
+            document.getElementById('end-modal').style.display = 'flex';
+        }
+
+        // --- LANCEMENT ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initUser();
+            renderSteps();
+        });
+    </script>
+</body>
+</html>
